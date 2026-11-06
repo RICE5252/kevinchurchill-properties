@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% from "macros.html" import card, desk with context %}
+{% block title %}{{ home.title }} — KevinChurchill Properties{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+{% block content %}
+<main class="wrap listing">
+  <p class="back"><a href="{{ url_for('search_page', intent=home.intent, area=home.area_slug) }}">Back to search</a></p>
+  <p class="kicker">{{ area_name(home.area_slug) }} · Listed {{ home.listed }}</p>
+  <h1>{{ home.title }}</h1>
+
+  <div class="detail">
+    <div class="gallery">
+      <img id="hero" src="{{ url_for('static', filename='photos/' + home.photos[0]) }}" alt="{{ home.title }}" />
+      <div class="thumbs">
+        {% for photo in home.photos %}
+        <button type="button" class="thumb {{ 'is-on' if loop.first else '' }}" data-src="{{ url_for('static', filename='photos/' + photo) }}">
+          <img src="{{ url_for('static', filename='photos/' + photo) }}" alt="" />
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <aside class="panel">
+      <p class="kicker">{{ 'Asking price' if home.intent == 'buy' else 'Annual rent' if home.intent == 'rent' else 'Nightly rate' }}</p>
+      <p class="price xl">{{ price_label(home) }}</p>
+      <p class="muted">{{ home.beds }} bd · {{ home.baths }} ba · {{ home.area_sqm }} m²</p>
+      <p>{{ home.street }}</p>
+      <button class="btn btn-line full save-btn" type="button" data-id="{{ home.id }}" aria-pressed="false">Save</button>
+
+      {% if home.intent == 'buy' %}
+      <div class="block" id="sketch" data-price="{{ home.price }}">
+        <h2>Payment sketch</h2>
+        <p class="muted">A sketch, not an offer. It amortises the balance after your down payment. Nigerian rates move.</p>
+        <label>
+          <span class="label">Down payment <span id="down-label">30</span>%</span>
+          <input id="down" type="range" min="20" max="60" value="30" />
+          <span class="muted" id="down-naira"></span>
+        </label>
+        <div class="two">
+          <label>
+            <span class="label">Years</span>
+            <select class="field" id="years">
+              {% for term in (10, 15, 20, 25) %}<option value="{{ term }}" {{ 'selected' if term == 20 else '' }}>{{ term }}</option>{% endfor %}
+            </select>
+          </label>
+          <label>
+            <span class="label">Rate %</span>
+            <input class="field" id="rate" type="number" min="0" max="40" step="0.5" value="22" />
+          </label>
+        </div>
+        <p class="price" id="monthly"></p>
+        <p class="muted" id="balance"></p>
+      </div>
+      {% elif home.intent == 'rent' %}
+      <div class="block">
+        <h2>How the rent sits</h2>
+        <p class="price">{{ format_naira((home.price / 12)|round|int) }} / month</p>
+        <p class="muted">Lagos rent is usually paid one or two years up front. The monthly figure is only the year divided by twelve.</p>
+      </div>
+      {% else %}
+      <div class="block">
+        <h2>A stay</h2>
+        <p>7 nights · {{ format_naira(home.price * 7) }}</p>
+        <p>30 nights · {{ format_naira(home.price * 30) }}</p>
+        <p class="muted">No caution fee is included.</p>
+      </div>
+      {% endif %}
+
+      <div class="block">
+        <h2>Ask the desk</h2>
+        <p class="muted">WhatsApp, email, or call about this home.</p>
+        {{ desk(home.title) }}
+        {% if sent %}
+        <p>Noted in enquiries.json on this computer. This sample does not send the note to a live desk.</p>
+        {% else %}
+        <form class="stack-form" method="post">
+          <label>
+            <span class="label">Name</span>
+            <input class="field" name="name" autocomplete="name" required />
+          </label>
+          <label>
+            <span class="label">Phone</span>
+            <input class="field" name="phone" autocomplete="tel" inputmode="tel" required />
+          </label>
+          <label>
+            <span class="label">Note</span>
+            <textarea class="field area" name="note"></textarea>
+          </label>
+          {% if error %}<p class="hint">{{ error }}</p>{% endif %}
+          <button class="btn btn-primary" type="submit">Send a note</button>
+        </form>
+        {% endif %}
+      </div>
+    </aside>
+
+    <div class="story">
+      <p>{{ home.summary }}</p>
+      <dl class="facts">
+        <div><dt>Type</dt><dd>{{ home.type }}</dd></div>
+        <div><dt>Year</dt><dd>{{ home.year }}</dd></div>
+        <div><dt>Parking</dt><dd>{{ home.parking }} cars</dd></div>
+        <div><dt>Furnishing</dt><dd>{{ home.furnishing }}</dd></div>
+        <div><dt>Title</dt><dd>{{ home.title_doc }}</dd></div>
+        <div><dt>Service charge</dt><dd>{{ home.service_charge }}</dd></div>
+      </dl>
+      <h2>On the map</h2>
+      <div class="map-frame"><div id="map" data-frame=""></div></div>
+      {% if similar %}
+      <h2>Nearby on the board</h2>
+      <div class="cards">
+        {% for item in similar %}{{ card(item) }}{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</main>
+<script id="map-data" type="application/json">{{ [pin]|tojson }}</script>
+{% endblock %}
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='map.js') }}"></script>
+<script src="{{ url_for('static', filename='listing.js') }}"></script>
+{% endblock %}

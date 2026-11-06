@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% from "macros.html" import card with context %}
+{% block title %}Search homes — KevinChurchill Properties{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+{% block content %}
+<div class="search-page">
+  <form class="filters" action="{{ url_for('search_page') }}" method="get">
+    <input type="hidden" name="intent" value="{{ q.intent }}" />
+    {% if q.box %}<input type="hidden" name="box" value="{{ q.box }}" />{% endif %}
+    <div class="seg" role="tablist" aria-label="Listing type">
+      {% for key, label in [("buy", "Buy"), ("rent", "Rent"), ("shortlet", "Short-let")] %}
+      <a class="seg-btn {{ 'is-on' if q.intent == key else '' }}" href="{{ url_for('search_page', intent=key, area=q.area, beds=q.beds, type=q.type, sort=q.sort) }}">{{ label }}</a>
+      {% endfor %}
+    </div>
+    <label class="grow">
+      <span class="label">Place</span>
+      <span class="inline">
+        <input class="field" name="place" value="{{ place }}" placeholder="Street or estate" aria-label="Place in Lagos" />
+        <button class="btn btn-primary" type="submit" name="find" value="1">Find</button>
+      </span>
+      {% if place_note %}<p class="hint">{{ place_note }}</p>{% endif %}
+    </label>
+    <label>
+      <span class="label">Neighbourhood</span>
+      <select class="field" name="area" onchange="this.form.box && (this.form.box.value=''); this.form.submit()">
+        <option value="all" {{ 'selected' if q.area == 'all' else '' }}>All of Lagos</option>
+        {% for area in areas %}
+        <option value="{{ area.slug }}" {{ 'selected' if q.area == area.slug else '' }}>{{ area.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span class="label">Beds</span>
+      <select class="field" name="beds" onchange="this.form.submit()">
+        <option value="0">Any</option>
+        {% for n in range(1, 6) %}
+        <option value="{{ n }}" {{ 'selected' if q.beds == n else '' }}>{{ n }}+</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span class="label">Type</span>
+      <select class="field" name="type" onchange="this.form.submit()">
+        <option value="all">Any</option>
+        {% for kind in types %}
+        <option value="{{ kind }}" {{ 'selected' if q.type == kind else '' }}>{{ kind }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span class="label">Min</span>
+      <select class="field" name="min" onchange="this.form.submit()">
+        {% for stop in stops %}
+        <option value="{{ stop }}" {{ 'selected' if q.min == stop else '' }}>{{ 'No min' if stop == 0 else format_compact(stop) }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span class="label">Max</span>
+      <select class="field" name="max" onchange="this.form.submit()">
+        {% for stop in stops %}
+        <option value="{{ stop }}" {{ 'selected' if q.max == stop else '' }}>{{ 'No max' if stop == 0 else format_compact(stop) }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      <span class="label">Sort</span>
+      <select class="field" name="sort" onchange="this.form.submit()">
+        <option value="featured" {{ 'selected' if q.sort == 'featured' else '' }}>Featured</option>
+        <option value="price-asc" {{ 'selected' if q.sort == 'price-asc' else '' }}>Price, low</option>
+        <option value="price-desc" {{ 'selected' if q.sort == 'price-desc' else '' }}>Price, high</option>
+      </select>
+    </label>
+    {% if dirty %}
+    <a class="btn btn-line" href="{{ url_for('search_page', intent=q.intent) }}">Reset</a>
+    {% endif %}
+  </form>
+
+  <div class="search-split is-list" id="split">
+    <main class="list-pane">
+      <h1>{{ headline }}</h1>
+      {% if results %}
+      <div class="stack">
+        {% for home in results %}{{ card(home) }}{% endfor %}
+      </div>
+      {% else %}
+      <div class="empty">
+        <p class="title">No homes match</p>
+        <p class="muted">{{ 'Nothing in this part of the map.' if q.box else 'Widen the price, or clear a filter.' }}</p>
+        <a class="btn btn-line" href="{{ url_for('search_page', intent=q.intent) }}">Reset filters</a>
+      </div>
+      {% endif %}
+      <p class="copy tight">© 2026 KevinChurchill Properties</p>
+    </main>
+    <div class="map-pane">
+      <div id="map" data-frame="{{ q.box }}"></div>
+      <button class="btn btn-primary map-float" id="search-area" type="button" hidden>Search this area</button>
+      <a class="map-preview" id="map-preview" hidden></a>
+    </div>
+  </div>
+  <div class="view-toggle">
+    <button type="button" class="seg-btn is-on" id="show-list">List</button>
+    <button type="button" class="seg-btn" id="show-map">Map</button>
+  </div>
+</div>
+<script id="map-data" type="application/json">{{ pins|tojson }}</script>
+{% endblock %}
+{% block footer %}{% endblock %}
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='map.js') }}"></script>
+{% endblock %}

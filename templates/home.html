@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% from "macros.html" import card with context %}
+{% block title %}KevinChurchill Properties — Search homes across Lagos{% endblock %}
+{% block content %}
+<main>
+  <div class="hero-stage">
+    <img class="hero-photo" src="{{ url_for('static', filename='photos/hero.jpg') }}" alt="Waterfront residences along the Lagos lagoon in late afternoon light" />
+  </div>
+  <div class="wrap narrow">
+    <form class="hero-card" action="{{ url_for('search_page') }}" method="get">
+      <p class="kicker">Lagos</p>
+      <h1>Find a home that fits the way you live.</h1>
+      <p class="lede">Buy, rent, or book a short-let. Prices sit on the map. {{ listing_count }} sample homes across {{ place_count }} neighbourhoods.</p>
+      <div class="seg seg-fill" role="radiogroup" aria-label="I want to">
+        <label class="seg-btn is-on"><input type="radio" name="intent" value="buy" checked /> Buy</label>
+        <label class="seg-btn"><input type="radio" name="intent" value="rent" /> Rent</label>
+        <label class="seg-btn"><input type="radio" name="intent" value="shortlet" /> Short-let</label>
+      </div>
+      <div class="two">
+        <label>
+          <span class="label">Neighbourhood</span>
+          <select class="field" name="area">
+            <option value="all">All of Lagos</option>
+            {% for area in areas_all %}
+            <option value="{{ area.slug }}">{{ area.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          <span class="label">Bedrooms</span>
+          <select class="field" name="beds">
+            <option value="0">Any</option>
+            {% for n in range(1, 6) %}
+            <option value="{{ n }}">{{ n }}+</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+      <button class="btn btn-primary full" type="submit">Search homes</button>
+    </form>
+  </div>
+
+  <section class="wrap section">
+    <div class="row">
+      <h2>On the board</h2>
+      <a href="{{ url_for('search_page') }}">All for sale</a>
+    </div>
+    <p class="muted">Sample homes, placed where a Lagos search would put them.</p>
+    <div class="cards">
+      {% for home in featured %}{{ card(home) }}{% endfor %}
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <h2 class="center">Neighbourhoods</h2>
+    <div class="place-row">
+      {% for area in areas %}
+      <a class="place-pill" href="{{ url_for('search_page', area=area.slug) }}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>
+        {{ area.name }}, Lagos
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <h2>How the prices read</h2>
+    <dl class="notes">
+      <div>
+        <dt>Buy</dt>
+        <dd>The asking price, in naira. The payment sketch on each page is not a loan offer.</dd>
+      </div>
+      <div>
+        <dt>Rent</dt>
+        <dd>Yearly, the Lagos way. A monthly figure is only the year divided by twelve.</dd>
+      </div>
+      <div>
+        <dt>Short-let</dt>
+        <dd>A nightly rate. A week is seven nights. No caution fee is folded in.</dd>
+      </div>
+    </dl>
+  </section>
+</main>
+{% endblock %}

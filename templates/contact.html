@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from "macros.html" import desk with context %}
+{% block title %}Contact — KevinChurchill Properties{% endblock %}
+{% block content %}
+<main class="wrap section narrow-page">
+  <p class="kicker">Lagos</p>
+  <h1>Contact us</h1>
+  <p class="lede">WhatsApp, email, or call the desk. {{ contact.hours }}, Lagos time. These details are for the sample site.</p>
+  {{ desk() }}
+</main>
+{% endblock %}

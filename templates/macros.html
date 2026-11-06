@@ -1,0 +1,43 @@
+{% macro heart() %}
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-9a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4.6-7 9-7 9z"/></svg>
+{% endmacro %}
+
+{% macro card(home) %}
+<article class="card">
+  <a href="{{ url_for('listing_page', home_id=home.id) }}">
+    <div class="photo-frame">
+      <img src="{{ url_for('static', filename='photos/' + home.photos[0]) }}" alt="" />
+    </div>
+    <p class="kicker">{{ intent_label(home.intent) }}</p>
+    <p class="price">{{ price_label(home) }}</p>
+    <p class="muted">{{ home.beds }} bd · {{ home.baths }} ba · {{ home.area_sqm }} m² · {{ home.type }}</p>
+    <p>{{ home.street }}</p>
+  </a>
+  <button class="icon-btn save-btn" type="button" data-id="{{ home.id }}" aria-pressed="false" aria-label="Save home">
+    {{ heart() }}
+  </button>
+</article>
+{% endmacro %}
+
+{% macro desk(about=None, compact=False) %}
+<ul class="desk {{ 'is-compact' if compact else '' }}">
+  <li>
+    <a href="{{ whatsapp_href(about) }}" target="_blank" rel="noreferrer">
+      <span class="kicker">WhatsApp</span>
+      <span>{{ contact.phone }}</span>
+    </a>
+  </li>
+  <li>
+    <a href="{{ email_href(about) }}">
+      <span class="kicker">Email</span>
+      <span>{{ contact.email }}</span>
+    </a>
+  </li>
+  <li>
+    <a href="tel:{{ contact.tel }}">
+      <span class="kicker">Phone</span>
+      <span>{{ contact.phone }}</span>
+    </a>
+  </li>
+</ul>
+{% endmacro %}

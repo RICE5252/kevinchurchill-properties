@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Not found — KevinChurchill Properties{% endblock %}
+{% block content %}
+<main class="wrap section">
+  <h1>That home is not on the board</h1>
+  <p class="muted">It may have been a sample that is no longer listed.</p>
+  <a class="btn btn-primary" href="{{ url_for('search_page') }}">Back to search</a>
+</main>
+{% endblock %}

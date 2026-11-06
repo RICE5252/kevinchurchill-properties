@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}KevinChurchill Properties{% endblock %}</title>
+    <meta name="description" content="KevinChurchill Properties. Search sample homes for sale, rent, and short-let across Lagos." />
+    <link rel="icon" href="{{ url_for('static', filename='brand/favicon.png') }}" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}" />
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="bar">
+        <a class="brand" href="{{ url_for('home_page') }}" aria-label="KevinChurchill Properties">
+          <img class="brand-logo" src="{{ url_for('static', filename='brand/kevinchurchill-lockup.png') }}" alt="" />
+        </a>
+        <nav class="nav">
+          <a href="{{ url_for('search_page') }}">Search</a>
+          <a href="{{ url_for('contact_page') }}">Contact</a>
+          <a href="{{ url_for('saved_page') }}">Saved <span class="saved-count" hidden></span></a>
+        </nav>
+      </div>
+    </header>
+    {% block content %}{% endblock %}
+    {% block footer %}{% include "footer.html" %}{% endblock %}
+    <script src="{{ url_for('static', filename='saved.js') }}"></script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

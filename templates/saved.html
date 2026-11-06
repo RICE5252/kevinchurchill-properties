@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Saved homes — KevinChurchill Properties{% endblock %}
+{% block content %}
+<main class="wrap section">
+  <h1>Saved homes</h1>
+  <p class="muted">Hearts stay in this browser. They are not sent anywhere.</p>
+  <div id="saved-grid" class="cards"></div>
+  <div id="saved-empty" class="empty" hidden>
+    <p class="title">Nothing saved yet</p>
+    <p class="muted">Open a search and tap the heart on a home.</p>
+    <a class="btn btn-primary" href="{{ url_for('search_page') }}">Browse homes</a>
+  </div>
+</main>
+<script id="catalog" type="application/json">{{ catalog|tojson }}</script>
+{% endblock %}

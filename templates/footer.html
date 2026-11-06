@@ -1,0 +1,16 @@
+{% from "macros.html" import desk with context %}
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <img class="brand-logo" src="{{ url_for('static', filename='brand/kevinchurchill-lockup.png') }}" alt="KevinChurchill Properties" />
+      <p class="muted">A sample Lagos home search. These listings are samples. Nothing here is a live offer.</p>
+      {{ desk(compact=True) }}
+    </div>
+    <nav class="area-links">
+      {% for area in areas_all %}
+      <a href="{{ url_for('search_page', area=area.slug) }}">{{ area.name }}</a>
+      {% endfor %}
+    </nav>
+  </div>
+  <p class="copy">© 2026 KevinChurchill Properties</p>
+</footer>
